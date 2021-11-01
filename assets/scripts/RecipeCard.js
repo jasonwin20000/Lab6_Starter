@@ -2,7 +2,9 @@ class RecipeCard extends HTMLElement {
   constructor() {
     // Part 1 Expose - TODO
 
-    // You'll want to attach the shadow DOM here
+    // You'll want to attach the shadow DOM here\
+    super();
+    this.attachShadow({mode: 'open'});
   }
 
   set data(data) {
@@ -86,7 +88,73 @@ class RecipeCard extends HTMLElement {
     styleElem.innerHTML = styles;
 
     // Here's the root element that you'll want to attach all of your other elements to
+    console.log(data);
     const card = document.createElement('article');
+    
+    let headline = searchForKey(data, 'headline');
+
+    const image = document.createElement('img');
+    let imageUrl = searchForKey(data, 'thumbnailUrl');
+    image.setAttribute('alt', headline);
+    image.setAttribute('src', imageUrl);
+    card.appendChild(image);
+
+    const title = document.createElement('p');
+    title.setAttribute('class', 'title');
+    card.appendChild(title);
+
+    const titleLink = document.createElement('a');
+    const titleUrl = getUrl(data);
+    titleLink.setAttribute('href', titleUrl);
+    titleLink.innerHTML = headline;
+    title.appendChild(titleLink);
+
+    const organization = document.createElement('p');
+    const orgName = getOrganization(data);
+    organization.setAttribute('class', 'organization');
+    organization.innerHTML = orgName;
+    card.appendChild(organization);
+
+    const rating = document.createElement('div');
+    rating.setAttribute('class', 'rating');
+    card.appendChild(rating);
+
+    if (searchForKey(data, 'ratingCount')) {
+      const span = document.createElement('span');
+      let ratingValue = searchForKey(data, 'ratingValue');
+      span.innerHTML = ratingValue;
+      rating.appendChild(span);
+
+      const ratingImage = document.createElement('img');
+      ratingImage.setAttribute('src', 'assets/images/icons/5-star.svg');
+      rating.appendChild(ratingImage);
+
+      const reviewCount = document.createElement('span');
+      const ratingCount = searchForKey(data, 'ratingCount');
+      reviewCount.innerHTML = '(' + ratingCount + ')';
+      rating.appendChild(reviewCount);
+    }
+    else {
+      const noReviewsSpan = document.createElement('span');
+      noReviewsSpan.innerHTML = "No Reviews";
+      rating.appendChild(noReviewsSpan);
+    }
+    
+    const time = document.createElement('time');
+    let timeValue = searchForKey(data, 'totalTime');
+    timeValue = convertTime(timeValue);
+    time.innerHTML = timeValue;
+    card.appendChild(time);
+
+    const ingredients = document.createElement('p');
+    ingredients.setAttribute('class', 'ingredients');
+    let ingredientList = searchForKey(data, 'recipeIngredient');
+    ingredientList = createIngredientList(ingredientList);
+    ingredients.innerHTML = ingredientList;
+    card.appendChild(ingredients);
+
+    this.shadowRoot.appendChild(card);
+    this.shadowRoot.appendChild(styleElem);
 
     // Some functions that will be helpful here:
     //    document.createElement()
